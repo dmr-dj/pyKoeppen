@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jan 18 18:10:07 CET 2019
-Last modified, Tue May  7 16:50:32 CEST 2019
+Last modified, Wed May  8 23:35:31 CEST 2019
 
  Copyright 2019 Didier M. Roche <didier.roche@lsce.ipsl.fr>
 
@@ -25,7 +25,8 @@ Last modified, Tue May  7 16:50:32 CEST 2019
 # Changes from version 0.0: Created the base code from the paper of Kottek et al., Meteorologische Zeitschrift, Vol. 15, No. 3, 259-263 (June 2006)
 # Changes from version 0.1: Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
 # Changes from version 0.2: Added the second version of KG classifications, according to Peel et al., 2007
-__version__ = "0.3"
+# Changes from version 0.3: Added the third version of  KG classifications, according to Cannon, 2012
+__version__ = "0.4"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -169,6 +170,132 @@ def get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wm
     return kg_classification
 #enddef get_kg_classification
 
+def get_kg_classification_Cannon(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th):
+
+    kg_classification=""
+
+    if T_ann >= 12.0:
+        if P_ann >= 1400.0 :
+            if P_min >= 70.0:
+               if P_ann >= 2800.0:
+                   if P_ann >= 3700.0:
+                       kg_classification="1WW"
+                   else:
+                       kg_classification="1WD"
+                   #endif
+               else: # P_ann < 2800
+                   if P_ann > 2000.0:
+                       kg_classification="1DW"
+                   else:
+                       kg_classification="1DD"
+                   #endif
+               #endif # on P_ann > 2800
+            else: # P_min < 70
+               if P_ann >= 2200.0:
+
+                   if P_smax >= 590.0:
+                       kg_classification="2Ww"
+                   else:
+                       kg_classification="2Wd"
+                   #endif
+
+               else: # P_ann < 2200
+                   if P_min > 30.0:
+                       if T_min >= 16.0:
+                           kg_classification="2Dh"
+                       else:
+                           kg_classification="2Dc"
+                       #endif
+                   else: # P_min < 30
+                       if P_wmax >= 170.0:
+                           kg_classification="2Dw"
+                       else:
+                           kg_classification="2Dd"
+                       #endif
+                   #endif # on P_min > 30
+               #endif # on P_ann > 2200
+            # endif on P_min
+        else: # P_ann < 1400
+            if P_ann >= 600.0:
+                if T_min >= 14.0:
+                    if T_max >= 30.0:
+                        kg_classification="3hh"
+                    else:
+                        if P_ann >= 1000.0:
+                            kg_classification="3hW"
+                        else:
+                            kg_classification="3hD"
+                        #endif
+                    #endif on T_max >= 30
+                else: # T_min < 14
+                    if P_wmin >= 40.0:
+                        kg_classification="3cw"
+                    else:
+                        kg_classification="3cd"
+                    #endif
+                #endif
+            else: # P_ann < 600.0
+                if T_ann >= 22:
+                    if P_smax >= 60.0 :
+                        kg_classification="3Hw"
+                    else:
+                        kg_classification="3Hd"
+                    #endif P_smax >= 60
+                else: # T_ann < 22
+                    if T_ann >= 18.0:
+                        kg_classification="3CH"
+                    else: # T_ann < 18
+                        kg_classification="3CC"
+                    #endif
+                #endif on T_ann >= 22
+            #endif on P_ann >= 600
+        #endif on P_ann >= 1400
+    else: # T_ann < 12
+        if T_ann >= -2.0:
+            if P_wmax >= 110.0:
+                if P_wmax >= 230:
+                    kg_classification="4Ww"
+                else:
+                    kg_classification="4Wd"
+                #endif
+            else: # P_wmax < 110
+                if T_ann >= 5:
+                    if P_ann >= 500:
+                        kg_classification="4HW"
+                    else:
+                        kg_classification="4HD"
+                    #endif
+                else: # T_ann < 5
+                    if T_max >= 16.0:
+                        kg_classification="4Ch"
+                    else:
+                        kg_classification="4Cc"
+                    #endif
+                #endif on T_ann >= 5
+            #endif P_wmax >= 110
+        else: #T_ann < -2.0
+            if T_max >= 5:
+                if T_ann >= -9:
+                    if T_max >= 13:
+                        kg_classification="5hh"
+                    else:
+                        kg_classification="5hc"
+                    #endif on T_max >= 13
+                else: # T_ann < -9
+                    kg_classification="5hC"
+                #endif T_ann >= -9
+            else: # T_max < 5
+                if P_min >= 50:
+                    kg_classification="5cw"
+                else:
+                    kg_classification="5cd"
+                #endif
+            #endif on T_max >= 5
+        #endif on T_ann >= -2
+    #endif on T_ann >= 12
+    return kg_classification
+#enddef get_kg_classification_Cannon
+
 
 if __name__ == "__main__":
 
@@ -184,7 +311,7 @@ if __name__ == "__main__":
   #~ var_temp = "tas"
   #~ varOut = RT.reGrid_to(tas_File,var_temp,prc_File,varForGrid=var_Grid,outFile="/home/roche/Soft-Devel/scripts/python/iloveclim-and-clim/tas_pcmdi-metrics_Amon_ERAINT_198901-200911-clim-GPCPGrid.nc")
 
-  dataset = "CRU"
+  dataset = "ERA"
 
   if dataset == "ERA":
 
@@ -336,7 +463,7 @@ if __name__ == "__main__":
   KG_map.mask = (T_max.mask+P_max.mask)
 
   import create_KG_cmap as CKG
-  KG_dict, the_chosen_map = CKG.KG_cmap_2007()
+  KG_dict, the_chosen_map = CKG.KG_cmap_2012()
 
   import progressbar as PB
   widgets = [PB.Bar('>'), ' ', PB.ETA(), ' ', PB.ReverseBar('<')]
@@ -350,7 +477,7 @@ if __name__ == "__main__":
     for i in range(P_th.shape[0]):
         for j in range(P_th.shape[1]):
             lis_t = []
-            KG_map[i,j] = KG_dict[get_kg_classification(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j])]
+            KG_map[i,j] = KG_dict[get_kg_classification_Cannon(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j])]
         #end for
         pbar.update(i)
     #end for
@@ -359,7 +486,7 @@ if __name__ == "__main__":
         for j in range(P_th.shape[1]):
             if  not T_max.mask[i,j] and not P_min.mask[i,j] :
                lis_t = []
-               KG_map[i,j] = KG_dict[get_kg_classification(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j],vers="peel")]
+               KG_map[i,j] = KG_dict[get_kg_classification_Cannon(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j])]
             #endif
         #end for
         pbar.update(i)

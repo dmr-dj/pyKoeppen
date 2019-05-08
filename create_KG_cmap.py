@@ -172,8 +172,56 @@ def KG_cmap_2007() :
               }
 
     return KG_dict, mpl.colors.ListedColormap(List_Colors)
-#end def KG_cmap_2006
+#end def KG_cmap_2007
 
+def KG_cmap_2012() :
+    import matplotlib as mpl
+
+    # To be done:
+    # Color scheme used by Cannon, 2012
+
+    List_Colors = ['#010feb','#0e72f9','#42a8fd','#f29790','#f60000','#ffda65','#f2a406',
+                   '#cbf74c','#66ec2e','#4bca23','#f3fa00','#c7c804','#a7a900','#98d995',
+                   '#65ca5e','#399a36','#15fffe','#39c7f8','#04767c','#0b4560','#f500fe',
+                   '#de00c7','#932e95','#956492','#adacd5','#597bda','#5054b0','#2b0d7c','#65696c',
+                   '#b3afb0']
+
+
+    KG_dict = {
+              "1WW" :  1,
+              "1WD" :  2,
+              "1DW" :  3,
+              "1DD" :  4,
+              "2Ww" :  5,
+              "2Wd" :  6,
+              "2Dh" :  7,
+              "2Dc" :  8,
+              "2Dw" :  9,
+              "2Dd" : 10,
+              "3hh" : 11,
+              "3hW" : 12,
+              "3hD" : 13,
+              "3cw" : 14,
+              "3cd" : 15,
+              "3Hw" : 16,
+              "3Hd" : 17,
+              "3CH" : 18,
+              "3CC" : 19,
+              "4Ww" : 20,
+              "4Wd" : 21,
+              "4HW" : 22,
+              "4HD" : 23,
+              "4Ch" : 24,
+              "4Cc" : 25,
+              "5hh" : 26,
+              "5hc" : 27,
+              "5hC" : 28,
+              "5cw" : 29,
+              "5cd" : 30
+              }
+
+    return KG_dict, mpl.colors.ListedColormap(List_Colors)
+#end def KG_cmap_2012
 
 
 # The End of All Things (op. cit.)
