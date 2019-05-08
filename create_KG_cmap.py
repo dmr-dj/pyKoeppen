@@ -54,7 +54,43 @@ def KG_cmap_2006() :
                    '#966400','#5a3c00','#320032','#640064','#c800c8','#c71585','#ff6dff',
                    '#ffb4ff','#e6c8ff','#c8c8c8','#c8b4ff','#9a7fb3','#8859b3','#6f24b3','#6496ff',
                    '#64ffff']
-    return mpl.colors.ListedColormap(List_Colors)
+
+    KG_dict = {
+              "Af"  :  1,
+              "Am"  :  2,
+              "As"  :  3,
+              "Aw"  :  4,
+              "BWk" :  5,
+              "BWh" :  6,
+              "BSk" :  7,
+              "BSh" :  8,
+              "Cfa" :  9,
+              "Cfb" : 10,
+              "Cfc" : 11,
+              "Csa" : 12,
+              "Csb" : 13,
+              "Csc" : 14,
+              "Cwa" : 15,
+              "Cwb" : 16,
+              "Cwc" : 17,
+              "Dfa" : 18,
+              "Dfb" : 19,
+              "Dfc" : 20,
+              "Dfd" : 21,
+              "Dsa" : 22,
+              "Dsb" : 23,
+              "Dsc" : 24,
+              "Dsd" : 25,
+              "Dwa" : 26,
+              "Dwb" : 27,
+              "Dwc" : 28,
+              "Dwd" : 29,
+              "EF"  : 30,
+              "ET"  : 31
+              }
+
+
+    return KG_dict, mpl.colors.ListedColormap(List_Colors)
 #end def KG_cmap_2006
 
 def KG_cmap_2007() :
@@ -65,7 +101,7 @@ def KG_cmap_2007() :
     # Hex colors
     # Af    010feb
     # Am    0e72f9
-    # As    ??????	Does not exist in Peel et al., 2007 || temporarily added 9b5656, to be removed later on ...
+    # As    ??????	Does not exist in Peel et al., 2007
     # Aw    42a8fd
     # BWk   f29790
     # BWh   f60000
@@ -95,12 +131,49 @@ def KG_cmap_2007() :
     # EF    65696c
     # ET    b3afb0
 
-    List_Colors = ['#010feb','#0e72f9','#9b5656','#42a8fd','#f29790','#f60000','#ffda65','#f2a406',
+    List_Colors = ['#010feb','#0e72f9','#42a8fd','#f29790','#f60000','#ffda65','#f2a406',
                    '#cbf74c','#66ec2e','#4bca23','#f3fa00','#c7c804','#a7a900','#98d995',
                    '#65ca5e','#399a36','#15fffe','#39c7f8','#04767c','#0b4560','#f500fe',
                    '#de00c7','#932e95','#956492','#adacd5','#597bda','#5054b0','#2b0d7c','#65696c',
                    '#b3afb0']
-    return mpl.colors.ListedColormap(List_Colors)
+
+
+    KG_dict = {
+              "Af"  :  1,
+              "Am"  :  2,
+              "Aw"  :  3,
+              "BWk" :  4,
+              "BWh" :  5,
+              "BSk" :  6,
+              "BSh" :  7,
+              "Cfa" :  8,
+              "Cfb" :  9,
+              "Cfc" : 10,
+              "Csa" : 11,
+              "Csb" : 12,
+              "Csc" : 13,
+              "Cwa" : 14,
+              "Cwb" : 15,
+              "Cwc" : 16,
+              "Dfa" : 17,
+              "Dfb" : 18,
+              "Dfc" : 19,
+              "Dfd" : 20,
+              "Dsa" : 21,
+              "Dsb" : 22,
+              "Dsc" : 23,
+              "Dsd" : 24,
+              "Dwa" : 25,
+              "Dwb" : 26,
+              "Dwc" : 27,
+              "Dwd" : 28,
+              "EF"  : 29,
+              "ET"  : 30
+              }
+
+    return KG_dict, mpl.colors.ListedColormap(List_Colors)
 #end def KG_cmap_2006
+
+
 
 # The End of All Things (op. cit.)

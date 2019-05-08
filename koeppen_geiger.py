@@ -24,8 +24,8 @@ Last modified, Tue May  7 16:50:32 CEST 2019
 
 # Changes from version 0.0: Created the base code from the paper of Kottek et al., Meteorologische Zeitschrift, Vol. 15, No. 3, 259-263 (June 2006)
 # Changes from version 0.1: Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
-
-__version__ = "0.2"
+# Changes from version 0.2: Added the second version of KG classifications, according to Peel et al., 2007
+__version__ = "0.3"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -41,7 +41,7 @@ __version__ = "0.2"
 #~ P_wmin		lowest monthly precipitation for the winter half-year	(mm/month)
 #~ P_wmax		highest monthly precipitation for the winter half-year	(mm/month)
 
-def get_Equatorial_Climates(P_min,P_ann,P_smin,P_wmin,classification="") :
+def get_Equatorial_Climates_Kottek(P_min,P_ann,P_smin,P_wmin,classification="") :
 
     if (P_min>60.0):
        classification+="f" # Equatorial rainforest, fully humid
@@ -55,6 +55,17 @@ def get_Equatorial_Climates(P_min,P_ann,P_smin,P_wmin,classification="") :
     return classification
 #enddef get_Equatorial_Climates
 
+def get_Equatorial_Climates_Peel(P_min,P_ann,P_smin,P_wmin,classification="") :
+
+    if (P_min>60.0):
+       classification+="f" # Equatorial rainforest, fully humid
+    elif (P_ann>=25.0*(100.0-P_min)):
+       classification+="m" # Equatorial monsoon
+    elif (P_min<=60.0):
+       classification+="w" # Equatorial Savannah
+    #endif
+    return classification
+#enddef get_Equatorial_Climates
 
 def get_Arid_Climates(P_ann,P_th,T_ann):
 
@@ -128,7 +139,7 @@ def get_Polar_Climates(T_max):
     return classification
 #enddef get_Snow_Climates
 
-def get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th):
+def get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th, vers="kottek"):
 
     kg_classification=""
 
@@ -140,7 +151,11 @@ def get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wm
        kg_classification+=get_Arid_Climates(P_ann,P_th,T_ann)
     elif T_min >= 18.0 :
        kg_classification+="A"
-       kg_classification+=get_Equatorial_Climates(P_min,P_ann,P_smin,P_wmin)
+       if vers == "kottek":
+         kg_classification+=get_Equatorial_Climates_Kottek(P_min,P_ann,P_smin,P_wmin)
+       else:
+         kg_classification+=get_Equatorial_Climates_Peel(P_min,P_ann,P_smin,P_wmin)
+       #endif
     elif  -3.0 < T_min and T_min < 18.0 :
        kg_classification+="C"
        kg_classification+=get_Warm_Temp_Climates(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon)
@@ -320,40 +335,8 @@ if __name__ == "__main__":
   KG_map = ma.zeros(P_th.shape,np.int)
   KG_map.mask = (T_max.mask+P_max.mask)
 
-  KG_dict = {
-              "Af"  :  1,
-              "Am"  :  2,
-              "As"  :  3,
-              "Aw"  :  4,
-              "BWk" :  5,
-              "BWh" :  6,
-              "BSk" :  7,
-              "BSh" :  8,
-              "Cfa" :  9,
-              "Cfb" : 10,
-              "Cfc" : 11,
-              "Csa" : 12,
-              "Csb" : 13,
-              "Csc" : 14,
-              "Cwa" : 15,
-              "Cwb" : 16,
-              "Cwc" : 17,
-              "Dfa" : 18,
-              "Dfb" : 19,
-              "Dfc" : 20,
-              "Dfd" : 21,
-              "Dsa" : 22,
-              "Dsb" : 23,
-              "Dsc" : 24,
-              "Dsd" : 25,
-              "Dwa" : 26,
-              "Dwb" : 27,
-              "Dwc" : 28,
-              "Dwd" : 29,
-              "EF"  : 30,
-              "ET"  : 31
-            }
-
+  import create_KG_cmap as CKG
+  KG_dict, the_chosen_map = CKG.KG_cmap_2007()
 
   import progressbar as PB
   widgets = [PB.Bar('>'), ' ', PB.ETA(), ' ', PB.ReverseBar('<')]
@@ -376,7 +359,7 @@ if __name__ == "__main__":
         for j in range(P_th.shape[1]):
             if  not T_max.mask[i,j] and not P_min.mask[i,j] :
                lis_t = []
-               KG_map[i,j] = KG_dict[get_kg_classification(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j])]
+               KG_map[i,j] = KG_dict[get_kg_classification(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j],vers="peel")]
             #endif
         #end for
         pbar.update(i)
@@ -395,9 +378,6 @@ if __name__ == "__main__":
   #~ max_bounds = ma.max(var2plot)
   #~ nbs_bounds = 30
   #~ fix_bounds = np.linspace(min_bounds,max_bounds,nbs_bounds)
-
-  import create_KG_cmap as CKG
-  the_chosen_map = CKG.KG_cmap_2007()
 
   fig = plt.figure(figsize=(10,10))
   ax = plt.axes(projection=ccrs.PlateCarree())
