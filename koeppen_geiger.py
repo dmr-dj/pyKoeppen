@@ -23,8 +23,9 @@ Last modified, Tue May  7 16:50:32 CEST 2019
 """
 
 # Changes from version 0.0: Created the base code from the paper of Kottek et al., Meteorologische Zeitschrift, Vol. 15, No. 3, 259-263 (June 2006)
+# Changes from version 0.1: Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
 
-__version__ = "0.1"
+__version__ = "0.2"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -174,8 +175,8 @@ if __name__ == "__main__":
 
 # ========== ERA-INTERIM
 
-    tas_File = "era-interim_t2m_monmean_1979-1999.nc"
-    prc_File = "era-interim_tp_monmean_1979-1999.nc"
+    tas_File = "test-data/era-interim_t2m_monmean_1979-1999.nc"
+    prc_File = "test-data/era-interim_tp_monmean_1979-1999.nc"
 
     var_temp = "t2m"
     var_Grid = 'tp'
@@ -194,8 +195,8 @@ if __name__ == "__main__":
   elif dataset == "CRU":
 # ========== CRU_TS / VASClimO
 
-    tas_File = "cru_ts4.02.1951.2000.tmp.dat-ymonmean.nc"
-    prc_File = "dataPrcpClim-ymonmean.nc"
+    tas_File = "test-data/cru_ts4.02.1951.2000.tmp.dat-ymonmean.nc"
+    prc_File = "test-data/dataPrcpClim-ymonmean.nc"
 
     var_temp = "tmp"
     var_Grid = 'prcp'
@@ -396,7 +397,7 @@ if __name__ == "__main__":
   #~ fix_bounds = np.linspace(min_bounds,max_bounds,nbs_bounds)
 
   import create_KG_cmap as CKG
-  the_chosen_map = CKG.KG_cmap_2006()
+  the_chosen_map = CKG.KG_cmap_2007()
 
   fig = plt.figure(figsize=(10,10))
   ax = plt.axes(projection=ccrs.PlateCarree())

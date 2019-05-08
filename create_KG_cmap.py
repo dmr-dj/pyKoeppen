@@ -14,6 +14,7 @@ __version__ = "0.1"
 def KG_cmap_2006() :
     import matplotlib as mpl
 
+    # Color scheme used by Kottek et al., 2006
 
     # Hex colors
     # Af    960000
@@ -53,6 +54,52 @@ def KG_cmap_2006() :
                    '#966400','#5a3c00','#320032','#640064','#c800c8','#c71585','#ff6dff',
                    '#ffb4ff','#e6c8ff','#c8c8c8','#c8b4ff','#9a7fb3','#8859b3','#6f24b3','#6496ff',
                    '#64ffff']
+    return mpl.colors.ListedColormap(List_Colors)
+#end def KG_cmap_2006
+
+def KG_cmap_2007() :
+    import matplotlib as mpl
+
+    # Color scheme used by Peel et al., 2007
+
+    # Hex colors
+    # Af    010feb
+    # Am    0e72f9
+    # As    ??????	Does not exist in Peel et al., 2007 || temporarily added 9b5656, to be removed later on ...
+    # Aw    42a8fd
+    # BWk   f29790
+    # BWh   f60000
+    # BSk   ffda65
+    # BSh   f2a406
+    # Cfa   cbf74c
+    # Cfb   66ec2e
+    # Cfc   4bca23
+    # Csa   f3fa00
+    # Csb   c7c804
+    # Csc   ??????	Does not occur in Peel et al., 2007 || Proposed: a7a900
+    # Cwa   98d995
+    # Cwb   65ca5e
+    # Cwc   399a36
+    # Dfa   15fffe
+    # Dfb   39c7f8
+    # Dfc   04767c
+    # Dfd   0b4560
+    # Dsa   f500fe
+    # Dsb   de00c7
+    # Dsc   932e95
+    # Dsd   956492
+    # Dwa   adacd5
+    # Dwb   597bda
+    # Dwc   5054b0
+    # Dwd   2b0d7c
+    # EF    65696c
+    # ET    b3afb0
+
+    List_Colors = ['#010feb','#0e72f9','#9b5656','#42a8fd','#f29790','#f60000','#ffda65','#f2a406',
+                   '#cbf74c','#66ec2e','#4bca23','#f3fa00','#c7c804','#a7a900','#98d995',
+                   '#65ca5e','#399a36','#15fffe','#39c7f8','#04767c','#0b4560','#f500fe',
+                   '#de00c7','#932e95','#956492','#adacd5','#597bda','#5054b0','#2b0d7c','#65696c',
+                   '#b3afb0']
     return mpl.colors.ListedColormap(List_Colors)
 #end def KG_cmap_2006
 
