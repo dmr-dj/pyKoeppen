@@ -26,7 +26,9 @@ Last modified, Wed May  8 23:35:31 CEST 2019
 # Changes from version 0.1: Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
 # Changes from version 0.2: Added the second version of KG classifications, according to Peel et al., 2007
 # Changes from version 0.3: Added the third version of  KG classifications, according to Cannon, 2012
-__version__ = "0.4"
+# Changes from version 0.4: Restructured the main code to have a one-dimensional main call
+# Changes from version 0.5: Pre-computed the number of months > 10.0 to transmit less data in the main call. Performance improvement 40%
+__version__ = "0.6"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -95,7 +97,7 @@ def get_Warm_Temp_Climates(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon):
 
     if T_max >= 22.0 :
        classification+="a" # Hot summer
-    elif ma.sum(ma.masked_greater_equal(T_mon,10.0).mask) >= 4 : # Modification done
+    elif T_mon >= 4 : # Modification done
        classification+="b" # Warm summer
     elif T_min > -38.0 :
        classification+="c" # Cool summer and cold winter
@@ -118,7 +120,7 @@ def get_Snow_Climates(P_smin,P_smax,P_wmin,P_wmax, T_min, T_max,T_mon):
     #endif
     if T_max >= 22.0 :
        classification+="a" # Hot summer
-    elif ma.sum(ma.masked_greater_equal(T_mon,10.0).mask) >= 4 : # Modification done
+    elif T_mon >= 4 : # Modification done
        classification+="b" # Warm summer
     elif T_min > -38.0 :
        classification+="c" # Cool summer and cold winter
@@ -140,7 +142,19 @@ def get_Polar_Climates(T_max):
     return classification
 #enddef get_Snow_Climates
 
-def get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th, vers="kottek"):
+def get_kg_classification(arguments, vers="peel"):
+
+    T_min = arguments[0]
+    T_max = arguments[1]
+    T_mon = arguments[2]
+    T_ann = arguments[3]
+    P_min = arguments[4]
+    P_ann = arguments[5]
+    P_smin= arguments[6]
+    P_smax= arguments[7]
+    P_wmin= arguments[8]
+    P_wmax= arguments[9]
+    P_th  = arguments[10]
 
     kg_classification=""
 
@@ -170,7 +184,7 @@ def get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wm
     return kg_classification
 #enddef get_kg_classification
 
-def get_kg_classification_Cannon(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th):
+def get_kg_classification_Cannon(T_min,T_max,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th):
 
     kg_classification=""
 
@@ -311,7 +325,7 @@ if __name__ == "__main__":
   #~ var_temp = "tas"
   #~ varOut = RT.reGrid_to(tas_File,var_temp,prc_File,varForGrid=var_Grid,outFile="/home/roche/Soft-Devel/scripts/python/iloveclim-and-clim/tas_pcmdi-metrics_Amon_ERAINT_198901-200911-clim-GPCPGrid.nc")
 
-  dataset = "CRU"
+  dataset = "ERA"
 
   if dataset == "ERA":
 
@@ -363,7 +377,10 @@ if __name__ == "__main__":
   T_min = ma.min( mon_TAS,axis=0)
   T_max = ma.max( mon_TAS,axis=0)
   T_ann = ma.mean(mon_TAS,axis=0)
-  T_mon = mon_TAS
+
+  T_mon = ma.sum(ma.masked_greater_equal(mon_TAS,10.0).mask,axis=0)
+
+  #~ T_mon = mon_TAS
 
   P_min = ma.min( mon_PRC,axis=0)
   P_max = ma.max( mon_PRC,axis=0)
@@ -460,51 +477,63 @@ if __name__ == "__main__":
   P_th = ma.where((var_1 + var_2)<=0.0,2*T_ann+14.0,var_1+var_2)
 
   KG_map = ma.zeros(P_th.shape,np.int)
-  KG_map.mask = (T_max.mask+P_max.mask)
+  KG_map.mask =  True # (T_max.mask+P_max.mask)
 
   import create_KG_cmap as CKG
-  KG_dict, the_chosen_map = CKG.KG_cmap_2012()
+  KG_dict, the_chosen_map = CKG.KG_cmap_2007()
 
   import progressbar as PB
-  widgets = [PB.Bar('>'), ' ', PB.ETA(), ' ', PB.ReverseBar('<')]
+  #~ widgets = [PB.Bar('>'), ' ', PB.ETA(), ' ', PB.ReverseBar('<')]
   #~ widgets = [PB.SimpleProgress()]
   #~ widgets = ['Test: ', PB.Percentage(), ' ', PB.Bar(marker=PB.RotatingMarker()),' ', PB.ETA(), ' ', PB.FileTransferSpeed()]
-  #~ widgets = [PB.Percentage(), PB.Bar()]
+  widgets = [PB.Percentage(), PB.Bar()]
 
-  pbar = PB.ProgressBar(widgets=widgets, maxval=P_th.shape[0]).start()
+  init_shape = T_min.shape
 
-  if not ma.is_masked(T_max) and not ma.is_masked(P_min):
-    for i in range(P_th.shape[0]):
-        for j in range(P_th.shape[1]):
-            lis_t = []
-            KG_map[i,j] = KG_dict[get_kg_classification_Cannon(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j])]
-        #end for
-        pbar.update(i)
-    #end for
-  else:
-    for i in range(P_th.shape[0]):
-        for j in range(P_th.shape[1]):
-            if  not T_max.mask[i,j] and not P_min.mask[i,j] :
-               lis_t = []
-               KG_map[i,j] = KG_dict[get_kg_classification_Cannon(T_min[i,j],T_max[i,j],T_mon[:,i,j],T_ann[i,j],P_min[i,j],P_ann[i,j],P_smin[i,j],P_smax[i,j],P_wmin[i,j],P_wmax[i,j],P_th[i,j])]
-            #endif
-        #end for
-        pbar.update(i)
-    #end for
-  #end if
+  Asize = T_min.size
 
+  ARGS = ma.zeros((11,Asize))
+
+  ARGS[0,:]  = T_min.flatten()
+  ARGS[1,:]  = T_max.flatten()
+  ARGS[2,:]  = T_mon.flatten()
+  ARGS[3,:]  = T_ann.flatten()
+  ARGS[4,:]  = P_min.flatten()
+  ARGS[5,:]  = P_ann.flatten()
+  ARGS[6,:]  = P_smin.flatten()
+  ARGS[7,:]  = P_smax.flatten()
+  ARGS[8,:]  = P_wmin.flatten()
+  ARGS[9,:]  = P_wmax.flatten()
+  ARGS[10,:] = P_th.flatten()
+
+  KG_MAP = KG_map.flatten()
+
+  pbar = PB.ProgressBar(widgets=widgets, maxval=Asize).start()
+
+  import time
+  start_time = time.time()
+
+  #~ import multiprocessing as MP
+
+  #~ pool = MP.Pool(processes=1)
+
+  #~ KG_MAP[i] = pool.map(get_kg_classification,[(T_MIN[i],T_MAX[i],T_MON[:,i],T_ANN[i],P_MIN[i],P_ANN[i],P_SMIN[i],P_SMAX[i],P_WMIN[i],P_WMAX[i],P_TH[i]) for i in range(P_TH.shape[0])])
+
+  for i in range(Asize):
+      #~ if  not T_MAX.mask[i] and not P_MIN.mask[i] :
+      KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i])]
+      #~ #endif
+      pbar.update(i)
+  #end for
+
+  KG_map = KG_MAP.reshape(init_shape)
   pbar.finish()
+  print("--- %s seconds ---" % (time.time() - start_time))
 
   import matplotlib.pyplot as plt
   import cartopy.crs as ccrs
 
-  #~ var2plot = ma.abs(KG_map-30)
   var2plot = KG_map
-
-  #~ min_bounds = ma.min(var2plot)
-  #~ max_bounds = ma.max(var2plot)
-  #~ nbs_bounds = 30
-  #~ fix_bounds = np.linspace(min_bounds,max_bounds,nbs_bounds)
 
   fig = plt.figure(figsize=(10,10))
   ax = plt.axes(projection=ccrs.PlateCarree())
@@ -513,21 +542,6 @@ if __name__ == "__main__":
   plt.colorbar(mesh, orientation='horizontal', shrink=0.75)
   ax.gridlines()
   ax.coastlines()
-
-  #~ T_min  = -4.0
-  #~ T_max  = 0.0
-  #~ T_mon  = 0.0
-  #~ T_ann  = 25.0
-  #~ P_min  = 80.0
-  #~ P_ann  = 24.0
-  #~ P_smin = 0.0
-  #~ P_smax = 0.0
-  #~ P_wmin = 0.0
-  #~ P_wmax = 0.0
-  #~ P_th   = 1.0
-
-  #~ print(get_kg_classification(T_min,T_max,T_mon,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th))
-
 
 #endif on main
 
