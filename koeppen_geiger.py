@@ -21,6 +21,24 @@ Last modified, Wed May  8 23:35:31 CEST 2019
 @author: Didier M. Roche a.k.a. dmr
 @author: Didier Paillard
 """
+# STD imports
+import time
+
+# Array imports
+import numpy as np
+from numpy import ma
+
+# Plotting imports
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+
+# Regional utilities imports
+import progressbar as PB
+import lcm_utils as lu
+
+# Local utilities imports
+import create_KG_cmap as CKG
+
 
 # Changes from version 0.0 : Created the base code from the paper of Kottek et al., Meteorologische Zeitschrift, Vol. 15, No. 3, 259-263 (June 2006)
 # Changes from version 0.1 : Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
@@ -28,8 +46,12 @@ Last modified, Wed May  8 23:35:31 CEST 2019
 # Changes from version 0.3 : Added the third version of  KG classifications, according to Cannon, 2012
 # Changes from version 0.4 : Restructured the main code to have a one-dimensional main call
 # Changes from version 0.5 : Pre-computed the number of months > 10.0 to transmit less data in the main call. Performance improvement 40%
-# Changes from version 0.60: Cleaned up unused variables
+# Changes from version 0.60: Cleaned up unused variables and imports using pylint
 __version__ = "0.61"
+
+
+
+
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -172,7 +194,7 @@ def get_kg_classification(arguments, vers="peel"):
        else:
          kg_classification+=get_Equatorial_Climates_Peel(P_min,P_ann)
        #endif
-    elif  -3.0 < T_min and T_min < 18.0 :
+    elif T_min > -3.0 and T_min < 18.0 :
        kg_classification+="C"
        kg_classification+=get_Warm_Temp_Climates(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon)
     elif T_min <= -3.0 and T_max >= 10.0 :
@@ -315,12 +337,6 @@ def get_kg_classification_Cannon(T_min,T_max,T_ann,P_min,P_ann,P_smax,P_wmin,P_w
 if __name__ == "__main__":
 
   print("This is Koeppen-Geiger classifications, version",__version__)
-
-  import lcm_utils as lu
-
-  import numpy as np
-  from numpy import ma
-
 
   #~ import regriding_to as RT
   #~ var_temp = "tas"
@@ -480,10 +496,10 @@ if __name__ == "__main__":
   KG_map = ma.zeros(P_th.shape,np.int)
   KG_map.mask =  True # (T_max.mask+P_max.mask)
 
-  import create_KG_cmap as CKG
+
   KG_dict, the_chosen_map = CKG.KG_cmap_2007()
 
-  import progressbar as PB
+
   #~ widgets = [PB.Bar('>'), ' ', PB.ETA(), ' ', PB.ReverseBar('<')]
   #~ widgets = [PB.SimpleProgress()]
   #~ widgets = ['Test: ', PB.Percentage(), ' ', PB.Bar(marker=PB.RotatingMarker()),' ', PB.ETA(), ' ', PB.FileTransferSpeed()]
@@ -511,7 +527,6 @@ if __name__ == "__main__":
 
   pbar = PB.ProgressBar(widgets=widgets, maxval=Asize).start()
 
-  import time
   start_time = time.time()
 
   for i in range(Asize):
@@ -527,8 +542,6 @@ if __name__ == "__main__":
 
   print("--- %s seconds ---" % (time.time() - start_time))
 
-  import matplotlib.pyplot as plt
-  import cartopy.crs as ccrs
 
   var2plot = KG_map
 
