@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on Fri Jan 18 18:10:07 CET 2019
-Last modified, Wed May  8 23:35:31 CEST 2019
+Last modified, Thu May  9 19:59:51 CEST 2019
 
  Copyright 2019 Didier M. Roche <didier.roche@lsce.ipsl.fr>
 
@@ -21,7 +22,8 @@ Last modified, Wed May  8 23:35:31 CEST 2019
 @author: Didier M. Roche a.k.a. dmr
 @author: Didier Paillard
 """
-# STD imports
+
+# STD imports
 import time
 
 # Array imports
@@ -47,11 +49,8 @@ import create_KG_cmap as CKG
 # Changes from version 0.4 : Restructured the main code to have a one-dimensional main call
 # Changes from version 0.5 : Pre-computed the number of months > 10.0 to transmit less data in the main call. Performance improvement 40%
 # Changes from version 0.60: Cleaned up unused variables and imports using pylint
-__version__ = "0.61"
-
-
-
-
+# Changes from version 0.61: Cleaned up duplicate routines in Kottek & Peel versions
+__version__ = "0.62"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -108,8 +107,7 @@ def get_Arid_Climates(P_ann,P_th,T_ann):
     return classification
 #enddef get_Arid_Climates
 
-def get_Warm_Temp_Climates(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon):
-
+def get_second_letter(P_smin,P_wmin,P_wmax,P_smax):
     if P_smin < P_wmin and P_wmax > 3.0*P_smin and P_smin < 40.0:
        classification="s" # WTC, dry summers
     elif P_wmin < P_smin and P_smax > 10.0*P_wmin:
@@ -117,42 +115,32 @@ def get_Warm_Temp_Climates(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon):
     else:
        classification="f" # WTC, fully humid
     #endif
+    return classification
+# end def get_second_letter
+
+def get_third_letter(T_max,T_mon,T_min):
 
     if T_max >= 22.0 :
-       classification+="a" # Hot summer
+       classification="a" # Hot summer
     elif T_mon >= 4 : # Modification done
-       classification+="b" # Warm summer
+       classification="b" # Warm summer
     elif T_min > -38.0 :
-       classification+="c" # Cool summer and cold winter
+       classification="c" # Cool summer and cold winter
     else:
-       classification+="d" # extremely continental
+       classification="d" # extremely continental
     #endif
 
     return classification
-#enddef get_Warm_Temp_Climates
+# end def get_third_letter
 
+def get_Second_Third_Letter(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon):
 
-def get_Snow_Climates(P_smin,P_smax,P_wmin,P_wmax, T_min, T_max,T_mon):
+    classification = get_second_letter(P_smin,P_wmin,P_wmax,P_smax)
 
-    if P_smin < P_wmin and P_wmax > 3.0*P_smin and P_smin < 40.0:
-       classification="s" # SC, dry summers
-    elif P_wmin < P_smin and P_smax > 10.0*P_wmin:
-       classification="w" # SC, dry winters
-    else:
-       classification="f" # SC, fully humid
-    #endif
-    if T_max >= 22.0 :
-       classification+="a" # Hot summer
-    elif T_mon >= 4 : # Modification done
-       classification+="b" # Warm summer
-    elif T_min > -38.0 :
-       classification+="c" # Cool summer and cold winter
-    else:
-       classification+="d" # extremely continental
-    #endif
+    classification += get_third_letter(T_max,T_mon,T_min)
 
     return classification
-#enddef get_Snow_Climates
+#enddef get_Second_Third_Letter
 
 def get_Polar_Climates(T_max):
 
@@ -196,10 +184,10 @@ def get_kg_classification(arguments, vers="peel"):
        #endif
     elif T_min > -3.0 and T_min < 18.0 :
        kg_classification+="C"
-       kg_classification+=get_Warm_Temp_Climates(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon)
+       kg_classification+=get_Second_Third_Letter(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon)
     elif T_min <= -3.0 and T_max >= 10.0 :
        kg_classification+="D"
-       kg_classification+=get_Snow_Climates(P_smin,P_smax,P_wmin,P_wmax,T_min, T_max,T_mon)
+       kg_classification+=get_Second_Third_Letter(P_smin,P_wmin,P_wmax,P_smax, T_max, T_min, T_mon)
     else:
        kg_classification="F"
     #endif T_min
@@ -342,7 +330,7 @@ if __name__ == "__main__":
   #~ var_temp = "tas"
   #~ varOut = RT.reGrid_to(tas_File,var_temp,prc_File,varForGrid=var_Grid,outFile="/home/roche/Soft-Devel/scripts/python/iloveclim-and-clim/tas_pcmdi-metrics_Amon_ERAINT_198901-200911-clim-GPCPGrid.nc")
 
-  dataset = "ERA"
+  dataset = "CRU"
 
   if dataset == "ERA":
 
@@ -395,9 +383,7 @@ if __name__ == "__main__":
   T_max = ma.max( mon_TAS,axis=0)
   T_ann = ma.mean(mon_TAS,axis=0)
 
-  T_mon = ma.sum(ma.masked_greater_equal(mon_TAS,10.0).mask,axis=0)
-
-  #~ T_mon = mon_TAS
+  T_mon = ma.sum(ma.masked_greater_equal(mon_TAS,10.0).mask,axis=0) # T_mon no longer contains Monthly Temp.
 
   P_min = ma.min( mon_PRC,axis=0)
   P_max = ma.max( mon_PRC,axis=0)
@@ -496,9 +482,7 @@ if __name__ == "__main__":
   KG_map = ma.zeros(P_th.shape,np.int)
   KG_map.mask =  True # (T_max.mask+P_max.mask)
 
-
   KG_dict, the_chosen_map = CKG.KG_cmap_2007()
-
 
   #~ widgets = [PB.Bar('>'), ' ', PB.ETA(), ' ', PB.ReverseBar('<')]
   #~ widgets = [PB.SimpleProgress()]
@@ -530,9 +514,9 @@ if __name__ == "__main__":
   start_time = time.time()
 
   for i in range(Asize):
-      #~ if  not T_MAX.mask[i] and not P_MIN.mask[i] :
-      KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i])]
-      #~ #endif
+      if  not ARGS.mask[4,i] and not ARGS.mask[0,i] :
+          KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i])]
+      #endif
       pbar.update(i)
   #end for
 
@@ -541,7 +525,6 @@ if __name__ == "__main__":
   pbar.finish()
 
   print("--- %s seconds ---" % (time.time() - start_time))
-
 
   var2plot = KG_map
 
