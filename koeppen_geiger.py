@@ -311,7 +311,7 @@ if __name__ == "__main__":
   #~ var_temp = "tas"
   #~ varOut = RT.reGrid_to(tas_File,var_temp,prc_File,varForGrid=var_Grid,outFile="/home/roche/Soft-Devel/scripts/python/iloveclim-and-clim/tas_pcmdi-metrics_Amon_ERAINT_198901-200911-clim-GPCPGrid.nc")
 
-  dataset = "ERA"
+  dataset = "CRU"
 
   if dataset == "ERA":
 
@@ -473,7 +473,7 @@ if __name__ == "__main__":
 
   pbar = PB.ProgressBar(widgets=widgets, maxval=P_th.shape[0]).start()
 
-  if dataset == "ERA" : # not T_max.mask:
+  if not ma.is_masked(T_max) and not ma.is_masked(P_min):
     for i in range(P_th.shape[0]):
         for j in range(P_th.shape[1]):
             lis_t = []
