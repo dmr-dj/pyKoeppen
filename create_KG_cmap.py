@@ -177,15 +177,50 @@ def KG_cmap_2007() :
 def KG_cmap_2012() :
     import matplotlib as mpl
 
-    # To be done:
     # Color scheme used by Cannon, 2012
 
-    List_Colors = ['#010feb','#0e72f9','#42a8fd','#f29790','#f60000','#ffda65','#f2a406',
-                   '#cbf74c','#66ec2e','#4bca23','#f3fa00','#c7c804','#a7a900','#98d995',
-                   '#65ca5e','#399a36','#15fffe','#39c7f8','#04767c','#0b4560','#f500fe',
-                   '#de00c7','#932e95','#956492','#adacd5','#597bda','#5054b0','#2b0d7c','#65696c',
-                   '#b3afb0']
+    # Hex colors
+    # 1WW   fd0001
+    # 1WD   fe5400
+    # 1DW   fcaa00
+    # 1DD   fefe00
+    # 2Ww   8fed8f
+    # 2Wd   72d374
+    # 2Dh   54b554
 
+    # 2Dc   3a9b3a
+    # 2Dw   1c7d1c
+    # 2Dd   006301
+    # 3hh   890101
+    # 3hW   941818
+    # 3hD   9b3332
+    # 3cw   a4504e
+
+    # 3cd   b0686b
+    # 3Hw   b78481
+    # 3Hd   be9f9d
+    # 3CH   cbb7b8
+    # 3CC   d2d2d2
+    # 4Ww   fc69b0
+    # 4Wd   eb59be
+
+    # 4HW   db4acd
+    # 4HD   c53ed8
+    # 4Ch   b32de2
+    # 4Cc   9f20ed
+    # 5hh   010088
+    # 5hc   003fa7
+    # 5hC   017ec1
+    # 5cw   02bee3
+
+    # 5cd   00fefc
+
+
+    List_Colors = ['#fd0001','#fe5400','#fcaa00','#fefe00','#8fed8f','#72d374','#54b554',
+                   '#3a9b3a','#1c7d1c','#006301','#890101','#941818','#9b3332','#a4504e',
+                   '#b0686b','#b78481','#be9f9d','#cbb7b8','#d2d2d2','#fc69b0','#eb59be',
+                   '#db4acd','#c53ed8','#b32de2','#9f20ed','#010088','#003fa7','#017ec1','#02bee3',
+                   '#00fefc']
 
     KG_dict = {
               "1WW" :  1,

@@ -50,7 +50,8 @@ import create_KG_cmap as CKG
 # Changes from version 0.5 : Pre-computed the number of months > 10.0 to transmit less data in the main call. Performance improvement 40%
 # Changes from version 0.60: Cleaned up unused variables and imports using pylint
 # Changes from version 0.61: Cleaned up duplicate routines in Kottek & Peel versions
-__version__ = "0.62"
+# Changes from version 0.62: Added the colormap of Cannon, Hydrol. Earth Syst. Sci., 16, 217-229, 2012
+__version__ = "0.63"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -195,7 +196,19 @@ def get_kg_classification(arguments, vers="peel"):
     return kg_classification
 #enddef get_kg_classification
 
-def get_kg_classification_Cannon(T_min,T_max,T_ann,P_min,P_ann,P_smax,P_wmin,P_wmax):
+def get_kg_classification_Cannon(arguments):
+
+    T_min = arguments[0]
+    T_max = arguments[1]
+    T_mon = arguments[2]
+    T_ann = arguments[3]
+    P_min = arguments[4]
+    P_ann = arguments[5]
+    P_smin= arguments[6]
+    P_smax= arguments[7]
+    P_wmin= arguments[8]
+    P_wmax= arguments[9]
+    P_th  = arguments[10]
 
     kg_classification=""
 
@@ -513,9 +526,17 @@ if __name__ == "__main__":
 
   start_time = time.time()
 
+  #~ for i in range(Asize):
+      #~ if  not ARGS.mask[4,i] and not ARGS.mask[0,i] :
+          #~ KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i])]
+      #~ #endif
+      #~ pbar.update(i)
+  #~ #end for
+
   for i in range(Asize):
       if  not ARGS.mask[4,i] and not ARGS.mask[0,i] :
-          KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i])]
+          KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i],vers="peel")]
+      #~ KG_MAP[i] = KG_dict[get_kg_classification_Cannon(ARGS[:,i])]
       #endif
       pbar.update(i)
   #end for
