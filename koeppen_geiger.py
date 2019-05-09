@@ -22,13 +22,14 @@ Last modified, Wed May  8 23:35:31 CEST 2019
 @author: Didier Paillard
 """
 
-# Changes from version 0.0: Created the base code from the paper of Kottek et al., Meteorologische Zeitschrift, Vol. 15, No. 3, 259-263 (June 2006)
-# Changes from version 0.1: Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
-# Changes from version 0.2: Added the second version of KG classifications, according to Peel et al., 2007
-# Changes from version 0.3: Added the third version of  KG classifications, according to Cannon, 2012
-# Changes from version 0.4: Restructured the main code to have a one-dimensional main call
-# Changes from version 0.5: Pre-computed the number of months > 10.0 to transmit less data in the main call. Performance improvement 40%
-__version__ = "0.6"
+# Changes from version 0.0 : Created the base code from the paper of Kottek et al., Meteorologische Zeitschrift, Vol. 15, No. 3, 259-263 (June 2006)
+# Changes from version 0.1 : Added the colorbar for reproducing the figures of Peel et al., Hydrol. Earth Syst. Sci., 11, 1633-1644, 2007
+# Changes from version 0.2 : Added the second version of KG classifications, according to Peel et al., 2007
+# Changes from version 0.3 : Added the third version of  KG classifications, according to Cannon, 2012
+# Changes from version 0.4 : Restructured the main code to have a one-dimensional main call
+# Changes from version 0.5 : Pre-computed the number of months > 10.0 to transmit less data in the main call. Performance improvement 40%
+# Changes from version 0.60: Cleaned up unused variables
+__version__ = "0.61"
 
 
 # I will assume I have the necessary variables computed somewhere else
@@ -58,7 +59,7 @@ def get_Equatorial_Climates_Kottek(P_min,P_ann,P_smin,P_wmin,classification="") 
     return classification
 #enddef get_Equatorial_Climates
 
-def get_Equatorial_Climates_Peel(P_min,P_ann,P_smin,P_wmin,classification="") :
+def get_Equatorial_Climates_Peel(P_min,P_ann,classification="") :
 
     if (P_min>60.0):
        classification+="f" # Equatorial rainforest, fully humid
@@ -169,7 +170,7 @@ def get_kg_classification(arguments, vers="peel"):
        if vers == "kottek":
          kg_classification+=get_Equatorial_Climates_Kottek(P_min,P_ann,P_smin,P_wmin)
        else:
-         kg_classification+=get_Equatorial_Climates_Peel(P_min,P_ann,P_smin,P_wmin)
+         kg_classification+=get_Equatorial_Climates_Peel(P_min,P_ann)
        #endif
     elif  -3.0 < T_min and T_min < 18.0 :
        kg_classification+="C"
@@ -184,7 +185,7 @@ def get_kg_classification(arguments, vers="peel"):
     return kg_classification
 #enddef get_kg_classification
 
-def get_kg_classification_Cannon(T_min,T_max,T_ann,P_min,P_ann,P_smin,P_smax,P_wmin,P_wmax,P_th):
+def get_kg_classification_Cannon(T_min,T_max,T_ann,P_min,P_ann,P_smax,P_wmin,P_wmax):
 
     kg_classification=""
 
@@ -513,12 +514,6 @@ if __name__ == "__main__":
   import time
   start_time = time.time()
 
-  #~ import multiprocessing as MP
-
-  #~ pool = MP.Pool(processes=1)
-
-  #~ KG_MAP[i] = pool.map(get_kg_classification,[(T_MIN[i],T_MAX[i],T_MON[:,i],T_ANN[i],P_MIN[i],P_ANN[i],P_SMIN[i],P_SMAX[i],P_WMIN[i],P_WMAX[i],P_TH[i]) for i in range(P_TH.shape[0])])
-
   for i in range(Asize):
       #~ if  not T_MAX.mask[i] and not P_MIN.mask[i] :
       KG_MAP[i] = KG_dict[get_kg_classification(ARGS[:,i])]
@@ -527,7 +522,9 @@ if __name__ == "__main__":
   #end for
 
   KG_map = KG_MAP.reshape(init_shape)
+
   pbar.finish()
+
   print("--- %s seconds ---" % (time.time() - start_time))
 
   import matplotlib.pyplot as plt
