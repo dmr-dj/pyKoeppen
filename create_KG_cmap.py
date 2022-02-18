@@ -258,5 +258,48 @@ def KG_cmap_2012() :
     return KG_dict, mpl.colors.ListedColormap(List_Colors)
 #end def KG_cmap_2012
 
+def KG_cmap_2014() :
+    import matplotlib as mpl
 
+    # Color scheme used by Belda et al., 2014
+
+    # Hex colors
+    # Ar    84070b
+    # Aw    cd1c0a
+    # As    b64f04
+    # BW    ffde49
+    # BS    f09137
+    # Cs    9fc301
+    # Cw    2c8a29
+    # Cf    009736
+    # Do    00add7
+    # Dc    b2559c
+    # Eo    1451a1
+    # Ec    0c356b
+    # Ft    c0c0c0
+    # Fi    8c8c8c
+
+    List_Colors = ['#84070b','#cd1c0a','#b64f04','#ffde49','#f09137','#9fc301','#2c8a29','#009736',
+                   '#00add7','#b2559c','#1451a1','#0c356b','#c0c0c0','#8c8c8c']
+
+    KG_dict = {
+              "Ar"  :  1,
+              "Aw"  :  2,
+              "As"  :  3,
+              "BW"  :  4,
+              "BS"  :  5,
+              "Cs"  :  6,
+              "Cw"  :  7,
+              "Cr"  :  8,
+              "Do"  :  9,
+              "Dc"  : 10,
+              "Eo"  : 11,
+              "Ec"  : 12,
+              "Ft"  : 13,
+              "Fi"  : 14
+              }
+
+
+    return KG_dict, mpl.colors.ListedColormap(List_Colors, name="belda14", N=14)
+#end def KG_cmap_2006
 # The End of All Things (op. cit.)
