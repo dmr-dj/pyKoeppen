@@ -8,7 +8,7 @@ Last modified, Fri Jan 18 18:10:07 CET 2019
 
 # Changes from version 0.1 :
 
-__version__ = "0.1"
+__version__ = "0.2"
 
 
 def KG_cmap_2006() :
